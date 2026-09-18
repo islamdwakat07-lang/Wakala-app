@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Wakala" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/accent</item>
+        <item name="android:windowBackground">@color/background_light</item>
+    </style>
+</resources>
