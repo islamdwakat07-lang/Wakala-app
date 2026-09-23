@@ -107,11 +107,11 @@ fun generateWakalaPdf(context: Context, data: WakalaData): File {
     canvas.translate(MARGIN, y)
     staticLayout.draw(canvas)
     canvas.restore()
-    y += staticLayout.height + 55f
+    y += staticLayout.height + 25f
 
     // Bottom section: date + الموكل on the right, lawyer's certification on the left,
     // with empty space below each for the real (handwritten) signature and stamp.
-    val bottomY = maxOf(y, PAGE_HEIGHT - 170f)
+    val bottomY = y
     val rightX = PAGE_WIDTH - MARGIN
     val leftX = MARGIN
 
