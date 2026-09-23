@@ -32,7 +32,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material3.CompositionLocalProvider
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -74,7 +74,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             WakalaTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    // The whole app reads right-to-left, matching the Arabic document itself.
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                         WakalaApp()
                     }
@@ -93,7 +92,6 @@ fun WakalaTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = colors, content = content)
 }
 
-/** Mirrors [buildWakalaSegments] but produces a Compose AnnotatedString for the live preview card. */
 private fun buildAnnotatedPreview(segments: List<TextSegment>): AnnotatedString = buildAnnotatedString {
     for (segment in segments) {
         if (segment.underlined) {
@@ -115,13 +113,13 @@ fun WakalaApp() {
     var name2 by rememberSaveable { mutableStateOf("") }
     var id2 by rememberSaveable { mutableStateOf("") }
     var hawz by rememberSaveable { mutableStateOf("") }
+    var hawzLocation by rememberSaveable { mutableStateOf("") }
     var qitaa by rememberSaveable { mutableStateOf("") }
     var village by rememberSaveable { mutableStateOf("") }
     var location by rememberSaveable { mutableStateOf("حورون و/أو قدوم و/أو سالم و/أو بيت ايل") }
     var qada by rememberSaveable { mutableStateOf("") }
     var dateText by rememberSaveable { mutableStateOf("") }
 
-    // Holds which field the next voice-recognition result should be written into.
     var voiceTarget by remember { mutableStateOf<((String) -> Unit)?>(null) }
 
     val speechLauncher = rememberLauncherForActivityResult(
@@ -160,7 +158,7 @@ fun WakalaApp() {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            val file = generateWakalaPdf(context, currentData(name1, id1, hasSecond, name2, id2, hawz, qitaa, village, location, qada, dateText))
+            val file = generateWakalaPdf(context, currentData(name1, id1, hasSecond, name2, id2, hawz, hawzLocation, qitaa, village, location, qada, dateText))
             val saved = saveToDownloads(context, file)
             Toast.makeText(context, if (saved) "تم الحفظ في مجلد التنزيلات" else "تعذر الحفظ", Toast.LENGTH_SHORT).show()
         } else {
@@ -168,7 +166,7 @@ fun WakalaApp() {
         }
     }
 
-    val data = currentData(name1, id1, hasSecond, name2, id2, hawz, qitaa, village, location, qada, dateText)
+    val data = currentData(name1, id1, hasSecond, name2, id2, hawz, hawzLocation, qitaa, village, location, qada, dateText)
     val segments = remember(data) { buildWakalaSegments(data) }
     val previewText = remember(segments) { buildAnnotatedPreview(segments) }
 
@@ -243,6 +241,13 @@ fun WakalaApp() {
             }
             Spacer(Modifier.height(8.dp))
             VoiceTextField(
+                label = "اسم الموقع",
+                value = hawzLocation,
+                onValueChange = { hawzLocation = it },
+                onVoiceClick = { startVoice { v -> hawzLocation = v } }
+            )
+            Spacer(Modifier.height(8.dp))
+            VoiceTextField(
                 label = "اسم البلد (أراضي ...)",
                 value = village,
                 onValueChange = { village = it },
@@ -251,7 +256,7 @@ fun WakalaApp() {
             )
             Spacer(Modifier.height(8.dp))
             VoiceTextField(
-                label = "اسم الموقع / دوائر التسجيل المختصة",
+                label = "اسم الدائرة",
                 value = location,
                 onValueChange = { location = it },
                 onVoiceClick = { startVoice { v -> location = v } }
@@ -356,7 +361,7 @@ fun WakalaApp() {
             TextButton(
                 onClick = {
                     name1 = ""; id1 = ""; hasSecond = false; name2 = ""; id2 = ""
-                    hawz = ""; qitaa = ""; village = ""
+                    hawz = ""; hawzLocation = ""; qitaa = ""; village = ""
                     location = "حورون و/أو قدوم و/أو سالم و/أو بيت ايل"
                     qada = ""; dateText = ""
                 },
@@ -379,8 +384,8 @@ fun WakalaApp() {
 
 private fun currentData(
     name1: String, id1: String, hasSecond: Boolean, name2: String, id2: String,
-    hawz: String, qitaa: String, village: String, location: String, qada: String, dateText: String
-) = WakalaData(name1, id1, hasSecond, name2, id2, hawz, qitaa, village, location, qada, dateText)
+    hawz: String, hawzLocation: String, qitaa: String, village: String, location: String, qada: String, dateText: String
+) = WakalaData(name1, id1, hasSecond, name2, id2, hawz, hawzLocation, qitaa, village, location, qada, dateText)
 
 @Composable
 fun VoiceTextField(
