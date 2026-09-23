@@ -1,9 +1,5 @@
-package com.wakala.generator
+ package com.wakala.generator
 
-/**
- * All the variable fields the lawyer fills in for one power-of-attorney (وكالة خصوصية).
- * Everything else in the document text is fixed and identical every time.
- */
 data class WakalaData(
     val name1: String = "",
     val id1: String = "",
@@ -11,6 +7,7 @@ data class WakalaData(
     val name2: String = "",
     val id2: String = "",
     val hawz: String = "",
+    val hawzLocation: String = "",
     val qitaa: String = "",
     val village: String = "",
     val location: String = "حورون و/أو قدوم و/أو سالم و/أو بيت ايل",
@@ -18,23 +15,18 @@ data class WakalaData(
     val dateText: String = ""
 )
 
-/** One run of text; [underlined] mirrors which parts are underlined on the original paper form. */
 data class TextSegment(val text: String, val underlined: Boolean = false)
 
 private fun ph(value: String, hint: String): String = value.ifBlank { "[$hint]" }
 
-/**
- * Builds the full body of the وكالة خصوصية as a list of segments (plain / underlined),
- * automatically switching between singular ("أنا/وكلت") and dual ("نحن/وكلنا") wording
- * depending on whether a second موكل was added.
- */
 fun buildWakalaSegments(d: WakalaData): List<TextSegment> {
     val n1 = ph(d.name1, "اسم الموكل")
     val i1 = ph(d.id1, "رقم الهوية")
     val hawz = ph(d.hawz, "رقم الحوض")
+    val hawzLocation = ph(d.hawzLocation, "اسم الموقع")
     val qitaa = ph(d.qitaa, "رقم القطعة")
     val village = ph(d.village, "اسم البلد")
-    val location = ph(d.location, "اسم الموقع")
+    val location = ph(d.location, "اسم الدائرة")
     val qada = ph(d.qada, "اسم القضاء")
 
     val segments = mutableListOf<TextSegment>()
@@ -57,7 +49,7 @@ fun buildWakalaSegments(d: WakalaData): List<TextSegment> {
         t(" قد وكلنا عنا المحامي عبدالله إسماعيل عبدالله دويكات هوية رقم ")
         t("854544970", true)
         t(" من ")
-        t(qada, true)
+        t("نابلس", true)
         t(" ليقدم و/أو يتابع استصدار اخراج قيد لدى دائرة تسجيل الأراضي في ")
         t(location)
         t(" ويرافع فيها على مأمور دائرة تسجيل أراضي ")
@@ -73,8 +65,12 @@ fun buildWakalaSegments(d: WakalaData): List<TextSegment> {
         t(qitaa)
         t(" من الحوض رقم ")
         t(hawz)
+        t(" موقع ")
+        t(hawzLocation)
         t(" من أراضي ")
         t(village)
+        t(" قضاء ")
+        t(qada)
         t(
             " وبذات الوقت مراجعة دائرة التنظيم وتقديم المعاملة أمام هذه الدوائر في أي منطقة من المناطق " +
                 "المذكورة أعلاه وأوكلناه بالتوقيع على جميع الطلبات والتعهدات والإقرارات وكافة الأوراق " +
@@ -91,7 +87,7 @@ fun buildWakalaSegments(d: WakalaData): List<TextSegment> {
         t(" قد وكلت عني المحامي عبدالله إسماعيل عبدالله دويكات هوية رقم ")
         t("854544970", true)
         t(" من ")
-        t(qada, true)
+        t("نابلس", true)
         t(" ليقدم و/أو يتابع استصدار اخراج قيد لدى دائرة تسجيل الأراضي في ")
         t(location)
         t(" ويرافع فيها على مأمور دائرة تسجيل أراضي ")
@@ -107,8 +103,12 @@ fun buildWakalaSegments(d: WakalaData): List<TextSegment> {
         t(qitaa)
         t(" من الحوض رقم ")
         t(hawz)
+        t(" موقع ")
+        t(hawzLocation)
         t(" من أراضي ")
         t(village)
+        t(" قضاء ")
+        t(qada)
         t(
             " وبذات الوقت مراجعة دائرة التنظيم وتقديم المعاملة أمام هذه الدوائر في أي منطقة من المناطق " +
                 "المذكورة أعلاه وأوكله بالتوقيع على جميع الطلبات والتعهدات والإقرارات وكافة الأوراق " +
