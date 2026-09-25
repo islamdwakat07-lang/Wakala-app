@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Share
@@ -66,6 +67,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import java.util.Calendar
 
 class MainActivity : ComponentActivity() {
@@ -75,7 +79,7 @@ class MainActivity : ComponentActivity() {
             WakalaTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        WakalaApp()
+                        AppNavHost()
                     }
                 }
             }
@@ -92,6 +96,27 @@ fun WakalaTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = colors, content = content)
 }
 
+@Composable
+fun AppNavHost() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            HomeScreen(navController)
+        }
+        composable("wakala_khususiya") {
+            WakalaApp(onBack = { navController.popBackStack() })
+        }
+        composable("placeholder/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            val card = findDocumentCard(id)
+            PlaceholderScreen(
+                title = card?.title ?: "قيد الإنشاء",
+                onBack = { navController.popBackStack() }
+            )
+        }
+    }
+}
+
 private fun buildAnnotatedPreview(segments: List<TextSegment>): AnnotatedString = buildAnnotatedString {
     for (segment in segments) {
         if (segment.underlined) {
@@ -104,7 +129,7 @@ private fun buildAnnotatedPreview(segments: List<TextSegment>): AnnotatedString 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WakalaApp() {
+fun WakalaApp(onBack: () -> Unit = {}) {
     val context = LocalContext.current
 
     var name1 by rememberSaveable { mutableStateOf("") }
@@ -171,7 +196,16 @@ fun WakalaApp() {
     val previewText = remember(segments) { buildAnnotatedPreview(segments) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("مولّد وكالة خصوصية") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("مولّد وكالة خصوصية") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "رجوع")
+                    }
+                }
+            )
+        }
     ) { padding ->
         Column(
             modifier = Modifier
