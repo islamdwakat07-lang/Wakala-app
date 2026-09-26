@@ -106,6 +106,9 @@ fun AppNavHost() {
         composable("wakala_khususiya") {
             WakalaApp(onBack = { navController.popBackStack() })
         }
+        composable("iqrar_tanzim") {
+            IqrarTanzimScreen(onBack = { navController.popBackStack() })
+        }
         composable("placeholder/{id}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             val card = findDocumentCard(id)
