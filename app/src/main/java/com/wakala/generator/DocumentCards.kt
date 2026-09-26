@@ -70,7 +70,7 @@ val documentCards = listOf(
         id = "iqrar_tanzim",
         title = "إقرار للتنظيم",
         icon = Icons.Filled.Assignment,
-        route = "placeholder/iqrar_tanzim",
+        route = "iqrar_tanzim",
         badgeBackground = Color(0xFFEDE7F6),
         badgeTint = Color(0xFF4527A0)
     ),
