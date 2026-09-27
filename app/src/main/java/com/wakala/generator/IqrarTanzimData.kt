@@ -6,6 +6,5 @@ data class IqrarTanzimData(
     val qitaa: String = "",
     val hawz: String = "",
     val village: String = "",
-    val requestNumber: String = "",
     val dateText: String = ""
 )
