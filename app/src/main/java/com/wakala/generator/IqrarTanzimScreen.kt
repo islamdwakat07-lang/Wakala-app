@@ -68,8 +68,8 @@ private fun buildIqrarAnnotatedPreview(segments: List<TextSegment>): AnnotatedSt
 
 private fun currentIqrarData(
     applicantName: String, idNumber: String, qitaa: String, hawz: String,
-    village: String, requestNumber: String, dateText: String
-) = IqrarTanzimData(applicantName, idNumber, qitaa, hawz, village, requestNumber, dateText)
+    village: String, dateText: String
+) = IqrarTanzimData(applicantName, idNumber, qitaa, hawz, village, dateText)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +81,6 @@ fun IqrarTanzimScreen(onBack: () -> Unit = {}) {
     var qitaa by rememberSaveable { mutableStateOf("") }
     var hawz by rememberSaveable { mutableStateOf("") }
     var village by rememberSaveable { mutableStateOf("") }
-    var requestNumber by rememberSaveable { mutableStateOf("") }
     var dateText by rememberSaveable { mutableStateOf("") }
 
     var voiceTarget by remember { mutableStateOf<((String) -> Unit)?>(null) }
@@ -122,7 +121,7 @@ fun IqrarTanzimScreen(onBack: () -> Unit = {}) {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            val file = generateIqrarTanzimPdf(context, currentIqrarData(applicantName, idNumber, qitaa, hawz, village, requestNumber, dateText))
+            val file = generateIqrarTanzimPdf(context, currentIqrarData(applicantName, idNumber, qitaa, hawz, village, dateText))
             val saved = saveToDownloads(context, file)
             Toast.makeText(context, if (saved) "تم الحفظ في مجلد التنزيلات" else "تعذر الحفظ", Toast.LENGTH_SHORT).show()
         } else {
@@ -130,7 +129,7 @@ fun IqrarTanzimScreen(onBack: () -> Unit = {}) {
         }
     }
 
-    val data = currentIqrarData(applicantName, idNumber, qitaa, hawz, village, requestNumber, dateText)
+    val data = currentIqrarData(applicantName, idNumber, qitaa, hawz, village, dateText)
     val segments = remember(data) { buildIqrarTanzimSegments(data) }
     val previewText = remember(segments) { buildIqrarAnnotatedPreview(segments) }
 
@@ -189,13 +188,6 @@ fun IqrarTanzimScreen(onBack: () -> Unit = {}) {
                 value = village,
                 onValueChange = { village = it },
                 onVoiceClick = { startVoice { v -> village = v } }
-            )
-            Spacer(Modifier.height(8.dp))
-            VoiceTextField(
-                label = "رقم طلب المعلومات",
-                value = requestNumber,
-                onValueChange = { requestNumber = it },
-                onVoiceClick = { startVoice { v -> requestNumber = v } }
             )
             Spacer(Modifier.height(8.dp))
 
@@ -289,7 +281,7 @@ fun IqrarTanzimScreen(onBack: () -> Unit = {}) {
             TextButton(
                 onClick = {
                     applicantName = ""; idNumber = ""; qitaa = ""; hawz = ""
-                    village = ""; requestNumber = ""; dateText = ""
+                    village = ""; dateText = ""
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
