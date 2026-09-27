@@ -135,7 +135,8 @@ fun generateAgreementSalePdf(context: Context, data: AgreementSaleData): File {
         pdfDocument.finishPage(page)
     }
 
-    val file = File(context.cacheDir, "اتفاقية-بيع.pdf")
+    val pdfDir = File(context.cacheDir, "pdfs").apply { mkdirs() }
+    val file = File(pdfDir, "اتفاقية-بيع.pdf")
     FileOutputStream(file).use { pdfDocument.writeTo(it) }
     pdfDocument.close()
     return file
