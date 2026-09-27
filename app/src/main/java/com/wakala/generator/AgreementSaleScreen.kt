@@ -1,24 +1,31 @@
 package com.wakala.generator
 
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.speech.RecognizerIntent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,6 +63,40 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
     var dateText by remember { mutableStateOf("") }
 
     val extraClauses = remember { mutableStateListOf<String>() }
+
+    var voiceTarget by remember { mutableStateOf<((String) -> Unit)?>(null) }
+
+    val speechLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val text = result.data
+                ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                ?.firstOrNull()
+            if (!text.isNullOrBlank()) voiceTarget?.invoke(text)
+        }
+    }
+
+    val micPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            tryLaunchSpeechRecognizer(context, speechLauncher)
+        } else {
+            Toast.makeText(context, "يلزم إذن المايكروفون للإدخال الصوتي", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun startVoice(setter: (String) -> Unit) {
+        voiceTarget = setter
+        val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+            PackageManager.PERMISSION_GRANTED
+        if (granted) {
+            tryLaunchSpeechRecognizer(context, speechLauncher)
+        } else {
+            micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
 
     fun currentData() = AgreementSaleData(
         party1Name = party1Name, party1Id = party1Id, party1Residence = party1Residence,
@@ -97,46 +138,46 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
                 .verticalScroll(rememberScrollState())
         ) {
             Text("الفريق الأول", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("اسم الفريق الأول", party1Name) { party1Name = it }
-            VoiceTextField("رقم هوية الفريق الأول", party1Id) { party1Id = it }
-            VoiceTextField("مكان سكن الفريق الأول", party1Residence) { party1Residence = it }
+            VoiceTextField("اسم الفريق الأول", party1Name, { party1Name = it }, { startVoice { v -> party1Name = v } })
+            VoiceTextField("رقم هوية الفريق الأول", party1Id, { party1Id = it }, { startVoice { v -> party1Id = v } })
+            VoiceTextField("مكان سكن الفريق الأول", party1Residence, { party1Residence = it }, { startVoice { v -> party1Residence = v } })
 
             Spacer(Modifier.height(16.dp))
             Text("الفريق الثاني", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("اسم الفريق الثاني", party2Name) { party2Name = it }
-            VoiceTextField("رقم هوية الفريق الثاني", party2Id) { party2Id = it }
-            VoiceTextField("مكان سكن الفريق الثاني", party2Residence) { party2Residence = it }
+            VoiceTextField("اسم الفريق الثاني", party2Name, { party2Name = it }, { startVoice { v -> party2Name = v } })
+            VoiceTextField("رقم هوية الفريق الثاني", party2Id, { party2Id = it }, { startVoice { v -> party2Id = v } })
+            VoiceTextField("مكان سكن الفريق الثاني", party2Residence, { party2Residence = it }, { startVoice { v -> party2Residence = v } })
 
             Spacer(Modifier.height(16.dp))
             Text("بيانات الأرض", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("وصف ملكية الفريق الأول (يملك ويتصرف في...)", ownershipDescription) { ownershipDescription = it }
+            VoiceTextField("وصف ملكية الفريق الأول (يملك ويتصرف في...)", ownershipDescription, { ownershipDescription = it }, { startVoice { v -> ownershipDescription = v } })
             Row {
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("رقم القطعة", qitaaNumbers) { qitaaNumbers = it }
+                    VoiceTextField("رقم القطعة", qitaaNumbers, { qitaaNumbers = it }, { startVoice { v -> qitaaNumbers = v } })
                 }
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("رقم الحوض", hawzNumber) { hawzNumber = it }
+                    VoiceTextField("رقم الحوض", hawzNumber, { hawzNumber = it }, { startVoice { v -> hawzNumber = v } })
                 }
             }
-            VoiceTextField("اسم المنطقة", locationName) { locationName = it }
-            VoiceTextField("القضاء", qada) { qada = it }
-            VoiceTextField("رغبة الفريق الثاني بالشراء (كامل حصص...)", party2WishDescription) { party2WishDescription = it }
-            VoiceTextField("رغبة الفريق الأول بالبيع (كامل حصصه...)", party1SellDescription) { party1SellDescription = it }
+            VoiceTextField("اسم المنطقة", locationName, { locationName = it }, { startVoice { v -> locationName = v } })
+            VoiceTextField("القضاء", qada, { qada = it }, { startVoice { v -> qada = v } })
+            VoiceTextField("رغبة الفريق الثاني بالشراء (كامل حصص...)", party2WishDescription, { party2WishDescription = it }, { startVoice { v -> party2WishDescription = v } })
+            VoiceTextField("رغبة الفريق الأول بالبيع (كامل حصصه...)", party1SellDescription, { party1SellDescription = it }, { startVoice { v -> party1SellDescription = v } })
 
             Spacer(Modifier.height(16.dp))
             Text("شروط البيع", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("الثمن", priceText) { priceText = it }
-            VoiceTextField("جهة التسجيل", transferOffice) { transferOffice = it }
-            VoiceTextField("مبلغ الغرامة", penaltyAmount) { penaltyAmount = it }
-            VoiceTextField("المحكمة المختصة", courtName) { courtName = it }
+            VoiceTextField("الثمن", priceText, { priceText = it }, { startVoice { v -> priceText = v } })
+            VoiceTextField("جهة التسجيل", transferOffice, { transferOffice = it }, { startVoice { v -> transferOffice = v } })
+            VoiceTextField("مبلغ الغرامة", penaltyAmount, { penaltyAmount = it }, { startVoice { v -> penaltyAmount = v } })
+            VoiceTextField("المحكمة المختصة", courtName, { courtName = it }, { startVoice { v -> courtName = v } })
             Row {
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("عدد الصفحات", pagesCount) { pagesCount = it }
+                    VoiceTextField("عدد الصفحات", pagesCount, { pagesCount = it }, { startVoice { v -> pagesCount = v } })
                 }
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("عدد النسخ", copiesCount) { copiesCount = it }
+                    VoiceTextField("عدد النسخ", copiesCount, { copiesCount = it }, { startVoice { v -> copiesCount = v } })
                 }
             }
 
@@ -161,9 +202,11 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.weight(1f)) {
                         VoiceTextField(
-                            "${clauseNumberWord(index + 12)}",
-                            clause
-                        ) { newVal -> extraClauses[index] = newVal }
+                            clauseNumberWord(index + 12),
+                            clause,
+                            { newVal -> extraClauses[index] = newVal },
+                            { startVoice { v -> extraClauses[index] = v } }
+                        )
                     }
                     IconButton(onClick = { extraClauses.removeAt(index) }) {
                         Icon(Icons.Default.Delete, contentDescription = "حذف البند")
@@ -211,7 +254,7 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
                 Button(
                     onClick = {
                         val file = generateAgreementSalePdf(context, currentData())
-                        saveToDownloads(context, file, "اتفاقية-بيع.pdf")
+                        saveToDownloads(context, file)
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text("حفظ في التنزيلات") }
