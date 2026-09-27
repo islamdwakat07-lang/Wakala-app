@@ -108,6 +108,7 @@ fun AppNavHost() {
         }
         composable("iqrar_tanzim") {
             IqrarTanzimScreen(onBack = { navController.popBackStack() })
+            composable("agreement_sale") { AgreementSaleScreen(onBack={navController.popBackStack()}) }
         }
         composable("placeholder/{id}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
