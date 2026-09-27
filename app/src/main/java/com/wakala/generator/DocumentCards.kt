@@ -29,7 +29,7 @@ val documentCards = listOf(
         id = "wakala_dawriya",
         title = "وكالة دورية",
         icon = Icons.Filled.Autorenew,
-        route = "placeholder/wakala_dawriya",
+        route = "agreement_sale",
         badgeBackground = Color(0xFFE3F2FD),
         badgeTint = Color(0xFF1565C0)
     ),
