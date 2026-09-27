@@ -47,7 +47,7 @@ fun generateIqrarTanzimPdf(context: Context, data: IqrarTanzimData): File {
         color = 0xFF111111.toInt()
     }
     val subPaint = TextPaint(titlePaint).apply {
-        textSize = 12.5f
+        textSize = 11f
         typeface = Typeface.DEFAULT
     }
     val linePaint = Paint().apply {
@@ -65,17 +65,21 @@ fun generateIqrarTanzimPdf(context: Context, data: IqrarTanzimData): File {
     val centerX = IQRAR_PAGE_WIDTH / 2f
     var y = IQRAR_MARGIN + 8f
 
-    canvas.drawText("يهودا والسامرة", centerX, y, subPaint)
-    y += 16f
-    canvas.drawText("יהודה ושומרון", centerX, y, subPaint)
-    y += 20f
-    canvas.drawText("دائرة التنظيم المركزية", centerX, y, titlePaint)
+    val headerRightX = IQRAR_PAGE_WIDTH - IQRAR_MARGIN
+    val headerLeftX = IQRAR_MARGIN
+    val arabicHeaderPaint = TextPaint(subPaint).apply { textAlign = Paint.Align.RIGHT }
+    val hebrewHeaderPaint = TextPaint(subPaint).apply { textAlign = Paint.Align.LEFT }
+    val arabicTitleHeaderPaint = TextPaint(titlePaint).apply { textSize = 12.5f; textAlign = Paint.Align.RIGHT }
+    val hebrewTitleHeaderPaint = TextPaint(titlePaint).apply { textSize = 12.5f; textAlign = Paint.Align.LEFT }
+
+    canvas.drawText("يهودا والسامرة", headerRightX, y, arabicHeaderPaint)
+    canvas.drawText("יהודה ושומרון", headerLeftX, y, hebrewHeaderPaint)
     y += 18f
-    canvas.drawText("לשכת התכנון המרכזי", centerX, y, subPaint)
-    y += 20f
-    canvas.drawText("رام الله - ص.ب 731 تلفون: 953372 - 952324", centerX, y, subPaint)
-    y += 16f
-    canvas.drawText("רמאללה ת.ד. 731 טל: 953372 - 952324", centerX, y, subPaint)
+    canvas.drawText("دائرة التنظيم المركزية", headerRightX, y, arabicTitleHeaderPaint)
+    canvas.drawText("לשכת התכנון המרכזי", headerLeftX, y, hebrewTitleHeaderPaint)
+    y += 18f
+    canvas.drawText("رام الله - ص.ب 731 تلفون: 953372 - 952324", headerRightX, y, arabicHeaderPaint)
+    canvas.drawText("רמאללה ת.ד. 731 טל: 953372 - 952324", headerLeftX, y, hebrewHeaderPaint)
     y += 14f
     canvas.drawLine(IQRAR_MARGIN, y, IQRAR_PAGE_WIDTH - IQRAR_MARGIN, y, linePaint)
     y += 28f
@@ -113,12 +117,9 @@ fun generateIqrarTanzimPdf(context: Context, data: IqrarTanzimData): File {
     val rightPaint = TextPaint(bottomPaint).apply { textAlign = Paint.Align.RIGHT }
     val leftPaint = TextPaint(bottomPaint).apply { textAlign = Paint.Align.LEFT }
 
+    canvas.drawText("مقدم الطلب: ......................", rightX, y, rightPaint)
     val dateLabel = "التاريخ: " + data.dateText.ifBlank { "......../......../............" }
-    canvas.drawText(dateLabel, rightX, y, rightPaint)
-    canvas.drawText(
-        "مقدم الطلب: " + data.applicantName.ifBlank { "......................." },
-        leftX, y, leftPaint
-    )
+    canvas.drawText(dateLabel, leftX, y, leftPaint)
 
     document.finishPage(page)
 
