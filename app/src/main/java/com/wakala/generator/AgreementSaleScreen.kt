@@ -33,33 +33,29 @@ import java.util.Calendar
 fun AgreementSaleScreen(onBack: () -> Unit = {}) {
     val context = LocalContext.current
 
-    var party1Name by remember { mutableStateOf("أحمد محمد يوسف الأحمد") }
-    var party1Id by remember { mutableStateOf("900112233") }
-    var party1Residence by remember { mutableStateOf("نابلس") }
+    var party1Name by remember { mutableStateOf("") }
+    var party1Id by remember { mutableStateOf("") }
+    var party1Residence by remember { mutableStateOf("") }
 
-    var party2Name by remember { mutableStateOf("خالد سالم عبدالله الخطيب") }
-    var party2Id by remember { mutableStateOf("900445566") }
-    var party2Residence by remember { mutableStateOf("نابلس") }
+    var party2Name by remember { mutableStateOf("") }
+    var party2Id by remember { mutableStateOf("") }
+    var party2Residence by remember { mutableStateOf("") }
 
-    var ownershipDescription by remember { mutableStateOf("حصص ارثية مشاعية في قطعتي") }
-    var qitaaNumbers by remember { mutableStateOf("52 و58") }
-    var hawzNumber by remember { mutableStateOf("12") }
-    var locationName by remember { mutableStateOf("جليجل بلاطه") }
-    var qada by remember { mutableStateOf("نابلس") }
+    var ownershipDescription by remember { mutableStateOf("") }
+    var qitaaNumbers by remember { mutableStateOf("") }
+    var hawzNumber by remember { mutableStateOf("") }
+    var locationName by remember { mutableStateOf("") }
+    var qada by remember { mutableStateOf("") }
 
-    var party2WishDescription by remember {
-        mutableStateOf("كامل حصص الفريق الأول الارثية المشاعية و/او الاصلية المشاعية بالغا مابلغت في قطعتي")
-    }
-    var party1SellDescription by remember {
-        mutableStateOf("كامل حصصه الارثية المشاعية و/او الاصلية المشاعية بالغا مابلغت في قطعتي")
-    }
+    var party2WishDescription by remember { mutableStateOf("") }
+    var party1SellDescription by remember { mutableStateOf("") }
 
-    var priceText by remember { mutableStateOf("ثمانية الاف واربعمائة وثمانون (8480) دينار اردني") }
-    var transferOffice by remember { mutableStateOf("دائرة تسجيل أراضي حورون و/او كاتب عدل نابلس و/او كاتب عدل القدس") }
-    var penaltyAmount by remember { mutableStateOf("10000") }
-    var courtName by remember { mutableStateOf("نابلس") }
-    var pagesCount by remember { mutableStateOf("صفحتين") }
-    var copiesCount by remember { mutableStateOf("ثلاثة (3)") }
+    var priceText by remember { mutableStateOf("") }
+    var transferOffice by remember { mutableStateOf("") }
+    var penaltyAmount by remember { mutableStateOf("") }
+    var courtName by remember { mutableStateOf("") }
+    var pagesCount by remember { mutableStateOf("") }
+    var copiesCount by remember { mutableStateOf("") }
     var dateText by remember { mutableStateOf("") }
 
     val extraClauses = remember { mutableStateListOf<String>() }
@@ -101,15 +97,25 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
     fun currentData() = AgreementSaleData(
         party1Name = party1Name, party1Id = party1Id, party1Residence = party1Residence,
         party2Name = party2Name, party2Id = party2Id, party2Residence = party2Residence,
-        ownershipDescription = ownershipDescription,
-        qitaaNumbers = qitaaNumbers, hawzNumber = hawzNumber,
-        locationName = locationName, qada = qada,
-        party2WishDescription = party2WishDescription,
-        party1SellDescription = party1SellDescription,
-        priceText = priceText, transferOffice = transferOffice,
-        penaltyAmount = penaltyAmount, courtName = courtName,
-        pagesCount = pagesCount, copiesCount = copiesCount,
-        dateText = dateText, extraClauses = extraClauses.toList()
+        ownershipDescription = ownershipDescription.ifBlank { "حصص ارثية مشاعية في قطعتي" },
+        qitaaNumbers = qitaaNumbers.ifBlank { "52 و58" },
+        hawzNumber = hawzNumber.ifBlank { "12" },
+        locationName = locationName.ifBlank { "جليجل بلاطه" },
+        qada = qada.ifBlank { "نابلس" },
+        party2WishDescription = party2WishDescription.ifBlank {
+            "كامل حصص الفريق الأول الارثية المشاعية و/او الاصلية المشاعية بالغا مابلغت في قطعتي"
+        },
+        party1SellDescription = party1SellDescription.ifBlank {
+            "كامل حصصه الارثية المشاعية و/او الاصلية المشاعية بالغا مابلغت في قطعتي"
+        },
+        priceText = priceText.ifBlank { "ثمانية الاف واربعمائة وثمانون (8480) دينار اردني" },
+        transferOffice = transferOffice.ifBlank { "دائرة تسجيل أراضي حورون و/او كاتب عدل نابلس و/او كاتب عدل القدس" },
+        penaltyAmount = penaltyAmount.ifBlank { "10000" },
+        courtName = courtName.ifBlank { "نابلس" },
+        pagesCount = pagesCount.ifBlank { "صفحتين" },
+        copiesCount = copiesCount.ifBlank { "ثلاثة (3)" },
+        dateText = dateText,
+        extraClauses = extraClauses.toList()
     )
 
     val calendar = Calendar.getInstance()
@@ -138,46 +144,46 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
                 .verticalScroll(rememberScrollState())
         ) {
             Text("الفريق الأول", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("اسم الفريق الأول", party1Name, { party1Name = it }, { startVoice { v -> party1Name = v } })
-            VoiceTextField("رقم هوية الفريق الأول", party1Id, { party1Id = it }, { startVoice { v -> party1Id = v } })
-            VoiceTextField("مكان سكن الفريق الأول", party1Residence, { party1Residence = it }, { startVoice { v -> party1Residence = v } })
+            VoiceTextField("اسم الفريق الأول", party1Name, { party1Name = it }, { startVoice { v -> party1Name = v } }, "مثال: أحمد محمد يوسف الأحمد")
+            VoiceTextField("رقم هوية الفريق الأول", party1Id, { party1Id = it }, { startVoice { v -> party1Id = v } }, "مثال: 900112233")
+            VoiceTextField("مكان سكن الفريق الأول", party1Residence, { party1Residence = it }, { startVoice { v -> party1Residence = v } }, "مثال: نابلس")
 
             Spacer(Modifier.height(16.dp))
             Text("الفريق الثاني", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("اسم الفريق الثاني", party2Name, { party2Name = it }, { startVoice { v -> party2Name = v } })
-            VoiceTextField("رقم هوية الفريق الثاني", party2Id, { party2Id = it }, { startVoice { v -> party2Id = v } })
-            VoiceTextField("مكان سكن الفريق الثاني", party2Residence, { party2Residence = it }, { startVoice { v -> party2Residence = v } })
+            VoiceTextField("اسم الفريق الثاني", party2Name, { party2Name = it }, { startVoice { v -> party2Name = v } }, "مثال: خالد سالم عبدالله الخطيب")
+            VoiceTextField("رقم هوية الفريق الثاني", party2Id, { party2Id = it }, { startVoice { v -> party2Id = v } }, "مثال: 900445566")
+            VoiceTextField("مكان سكن الفريق الثاني", party2Residence, { party2Residence = it }, { startVoice { v -> party2Residence = v } }, "مثال: نابلس")
 
             Spacer(Modifier.height(16.dp))
             Text("بيانات الأرض", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("وصف ملكية الفريق الأول (يملك ويتصرف في...)", ownershipDescription, { ownershipDescription = it }, { startVoice { v -> ownershipDescription = v } })
+            VoiceTextField("وصف ملكية الفريق الأول", ownershipDescription, { ownershipDescription = it }, { startVoice { v -> ownershipDescription = v } }, "مثال: حصص ارثية مشاعية في قطعتي")
             Row {
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("رقم القطعة", qitaaNumbers, { qitaaNumbers = it }, { startVoice { v -> qitaaNumbers = v } })
+                    VoiceTextField("رقم القطعة", qitaaNumbers, { qitaaNumbers = it }, { startVoice { v -> qitaaNumbers = v } }, "مثال: 52 و58")
                 }
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("رقم الحوض", hawzNumber, { hawzNumber = it }, { startVoice { v -> hawzNumber = v } })
+                    VoiceTextField("رقم الحوض", hawzNumber, { hawzNumber = it }, { startVoice { v -> hawzNumber = v } }, "مثال: 12")
                 }
             }
-            VoiceTextField("اسم المنطقة", locationName, { locationName = it }, { startVoice { v -> locationName = v } })
-            VoiceTextField("القضاء", qada, { qada = it }, { startVoice { v -> qada = v } })
-            VoiceTextField("رغبة الفريق الثاني بالشراء (كامل حصص...)", party2WishDescription, { party2WishDescription = it }, { startVoice { v -> party2WishDescription = v } })
-            VoiceTextField("رغبة الفريق الأول بالبيع (كامل حصصه...)", party1SellDescription, { party1SellDescription = it }, { startVoice { v -> party1SellDescription = v } })
+            VoiceTextField("اسم المنطقة", locationName, { locationName = it }, { startVoice { v -> locationName = v } }, "مثال: جليجل بلاطه")
+            VoiceTextField("القضاء", qada, { qada = it }, { startVoice { v -> qada = v } }, "مثال: نابلس")
+            VoiceTextField("رغبة الفريق الثاني بالشراء", party2WishDescription, { party2WishDescription = it }, { startVoice { v -> party2WishDescription = v } }, "مثال: كامل حصص الفريق الأول الارثية المشاعية...")
+            VoiceTextField("رغبة الفريق الأول بالبيع", party1SellDescription, { party1SellDescription = it }, { startVoice { v -> party1SellDescription = v } }, "مثال: كامل حصصه الارثية المشاعية...")
 
             Spacer(Modifier.height(16.dp))
             Text("شروط البيع", style = MaterialTheme.typography.titleMedium)
-            VoiceTextField("الثمن", priceText, { priceText = it }, { startVoice { v -> priceText = v } })
-            VoiceTextField("جهة التسجيل", transferOffice, { transferOffice = it }, { startVoice { v -> transferOffice = v } })
-            VoiceTextField("مبلغ الغرامة", penaltyAmount, { penaltyAmount = it }, { startVoice { v -> penaltyAmount = v } })
-            VoiceTextField("المحكمة المختصة", courtName, { courtName = it }, { startVoice { v -> courtName = v } })
+            VoiceTextField("الثمن", priceText, { priceText = it }, { startVoice { v -> priceText = v } }, "مثال: ثمانية الاف واربعمائة وثمانون (8480) دينار اردني")
+            VoiceTextField("جهة التسجيل", transferOffice, { transferOffice = it }, { startVoice { v -> transferOffice = v } }, "مثال: دائرة تسجيل أراضي حورون")
+            VoiceTextField("مبلغ الغرامة", penaltyAmount, { penaltyAmount = it }, { startVoice { v -> penaltyAmount = v } }, "مثال: 10000")
+            VoiceTextField("المحكمة المختصة", courtName, { courtName = it }, { startVoice { v -> courtName = v } }, "مثال: نابلس")
             Row {
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("عدد الصفحات", pagesCount, { pagesCount = it }, { startVoice { v -> pagesCount = v } })
+                    VoiceTextField("عدد الصفحات", pagesCount, { pagesCount = it }, { startVoice { v -> pagesCount = v } }, "مثال: صفحتين")
                 }
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f)) {
-                    VoiceTextField("عدد النسخ", copiesCount, { copiesCount = it }, { startVoice { v -> copiesCount = v } })
+                    VoiceTextField("عدد النسخ", copiesCount, { copiesCount = it }, { startVoice { v -> copiesCount = v } }, "مثال: ثلاثة (3)")
                 }
             }
 
@@ -243,8 +249,12 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = {
-                        val file = generateAgreementSalePdf(context, currentData())
-                        sharePdf(context, file)
+                        try {
+                            val file = generateAgreementSalePdf(context, currentData())
+                            sharePdf(context, file)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "خطأ أثناء إنشاء الملف: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text("مشاركة PDF") }
@@ -253,8 +263,12 @@ fun AgreementSaleScreen(onBack: () -> Unit = {}) {
 
                 Button(
                     onClick = {
-                        val file = generateAgreementSalePdf(context, currentData())
-                        saveToDownloads(context, file)
+                        try {
+                            val file = generateAgreementSalePdf(context, currentData())
+                            saveToDownloads(context, file)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "خطأ أثناء إنشاء الملف: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text("حفظ في التنزيلات") }
